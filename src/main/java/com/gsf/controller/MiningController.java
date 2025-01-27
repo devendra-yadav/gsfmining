@@ -66,7 +66,7 @@ public class MiningController {
 		
 		log.info(""+clientData);
 		
-		return "Wrong mining request by "+user;
+		return "Invalid mining request by "+user;
 		
 	}
 
