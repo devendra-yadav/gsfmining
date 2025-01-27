@@ -1,5 +1,7 @@
 package com.gsf.entity;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -20,13 +22,25 @@ public class UserCoins {
 	
 	private String user;
 	
-	private double coins;
+	private double minedCoins;
 	
-	boolean miningSessionOn;
+	private boolean miningSessionOn;
+	
+	private LocalDateTime joiningDateTime = LocalDateTime.now();
+	
+	private String lastMiningDeviceIPAddress;
+	
+	private String lastMiningDevice;
+	
+	private String lastMiningDeviceOs;
+	
+	private String lastMiningUserAgent;
+	
+	private LocalDateTime lastMiningSession = LocalDateTime.now();
 	
 	public UserCoins(String user, double coins, boolean miningSessionOn) {
 		this.user=user;
-		this.coins=coins;
+		this.minedCoins=coins;
 		this.miningSessionOn=false;
 	}
 	

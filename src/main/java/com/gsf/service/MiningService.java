@@ -1,5 +1,8 @@
 package com.gsf.service;
 
+import java.time.LocalDateTime;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,7 +32,7 @@ public class MiningService {
 	
 	
 	@Async
-	public void start(String user) {
+	public void start(String user, Map<String, String> clientData) {
 		
 		if(isMiningSessionOn(user)) {
 			log.info("Mining session is already on for the user "+user+" !!!!!!!!!!");
@@ -38,11 +41,16 @@ public class MiningService {
 			setMiningSessionFlag(user, true);
 		}
 		
+		UserCoins userCoins = userCoinsRepository.getByUser(user);
+		double currentCoins = userCoins.getMinedCoins();
+		userCoins.setLastMiningDeviceIPAddress(clientData.get("host"));
+		userCoins.setLastMiningDevice(clientData.get("device_family"));
+		userCoins.setLastMiningDeviceOs(clientData.get("os_family"));
+		userCoins.setLastMiningUserAgent(clientData.get("userAgent_family"));
+		
 		long currentTime = System.currentTimeMillis();
 		long endTime = currentTime + miningDuration;
 		
-		UserCoins userCoins = userCoinsRepository.getByUser(user);
-		double currentCoins = userCoins.getCoins();
 		log.info(">>>> Mining Session started for "+user+". Current coins : "+currentCoins);
 		while(currentTime < endTime) {
 			currentCoins+=miningRate;
@@ -56,11 +64,11 @@ public class MiningService {
 			currentTime = System.currentTimeMillis();
 		}
 		
-		userCoins.setCoins(currentCoins);
+		userCoins.setMinedCoins(currentCoins);
 		userCoins.setMiningSessionOn(false);
-		
+		userCoins.setLastMiningSession(LocalDateTime.now());
 		userCoinsRepository.save(userCoins);
-		log.info(">>>> Mining session ended for "+user+". Total coins : "+userCoins.getCoins());
+		log.info(">>>> Mining session ended for "+user+". Total coins : "+userCoins.getMinedCoins());
 		
 	}
 
